@@ -1,0 +1,27 @@
+### GoogleHelper ###
+# Config file with credentials data of Google API.
+# Need to get from: https://console.cloud.google.com/apis/credentials?authuser=0&project=perfluencetoolid&supportedpurview=project
+# Example: src/main/resources/google-sheets-client-secret_template.json
+src/main/resources/google-sheets-client-secret_template.json
+# Config file with credentials data of Google API.
+# Need to get from file: google-sheets-client-secret.json
+# Need to get file by Url: https://console.cloud.google.com/apis/credentials?authuser=0&project=perfluencetoolid&supportedpurview=project
+# Example file: src/main/resources/google-sheets-client-secret_example.json
+src/main/resources/application.properties
+
+### Maven ###
+target/
+
+### Gradle ###
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### IntelliJ IDEA ###
+.idea
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
