@@ -65,20 +65,23 @@ public class GoogleAuthorizeUtil {
                     scopes)
                     .setDataStoreFactory(new MemoryDataStoreFactory())
                     .setAccessType("offline")
-                    .setApprovalPrompt("auto")
+//                    .setApprovalPrompt("auto")
+                    // https://stackoverflow.com/questions/8942340/get-refresh-token-google-api
+                    .setApprovalPrompt("consent")
                     .build();
 
             return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException(
                     String.format("'%s' file can not be read.", GOOGLE_SHEETS_CLIENT_SECRET_TEMPLATE_JSON_FILE_PATH));
         } catch (GeneralSecurityException e) {
+            e.printStackTrace();
             throw new RuntimeException(
                     String.format("Can not be authorisation with '%s.properties' data.", PropertiesName.APPLICATION_CONFIG));
         }
     }
 
-    //
     /**
      * Notes: https://ru.stackoverflow.com/a/510182
      */
@@ -93,10 +96,12 @@ public class GoogleAuthorizeUtil {
             credential.refreshToken();
             return credential;
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException(
                     String.format("Can not be to refresh token for authorisation data from '%s.properties'.",
                             PropertiesName.APPLICATION_CONFIG));
         } catch (GeneralSecurityException e) {
+            e.printStackTrace();
             throw new RuntimeException(
                     String.format("Can not be generate credential with '%s.properties' data.", PropertiesName.APPLICATION_CONFIG));
         }

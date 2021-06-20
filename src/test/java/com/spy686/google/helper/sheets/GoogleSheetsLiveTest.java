@@ -40,12 +40,23 @@ public class GoogleSheetsLiveTest {
     }
 
     @Test
-    public void writeToSheet(){
+    public void writeToSheetTest(){
         List<String[]> data = new ArrayList<>();
         data.add(new String[]{LocalDateTime.now().toString(), "2", "3"});
         data.add(new String[]{"a", "s", "d"});
 
         SheetsServiceUtil.writeToSheet(data, SPREADSHEET_ID);
+    }
+
+    @Test
+    public void createNewListTest(){
+        List<String[]> data = new ArrayList<>();
+        data.add(new String[]{LocalDateTime.now().toString(), "2", "3"});
+        data.add(new String[]{"a", "s", "d"});
+
+        String sheetName = LocalDateTime.now().toString().replaceAll("[^\\w ]", "_");
+        SheetsServiceUtil.createNewList(sheetName, SPREADSHEET_ID);
+        SheetsServiceUtil.writeToSheet(data, SPREADSHEET_ID, sheetName);
     }
 
     @Test
