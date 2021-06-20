@@ -127,7 +127,6 @@
         <google-sheets.version>v4-rev493-1.21.0</google-sheets.version>
         <org.assertj.core.version>3.9.0</org.assertj.core.version>
         <docx4j.version>3.3.5</docx4j.version>
-        <jaxb-api.version>2.1</jaxb-api.version>
 
         <junit.version>4.12</junit.version>
         <hamcrest.version>2.2</hamcrest.version>
