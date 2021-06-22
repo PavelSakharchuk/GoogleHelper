@@ -21,18 +21,24 @@ import java.util.List;
 
 public class SheetsServiceUtil {
 
+    private static Sheets sheetsService;
+
     public static Sheets getSheetsService() {
-        Credential credential = GoogleAuthorizeUtil.authorize();
-        try {
-            return new Sheets.Builder(
-                    GoogleNetHttpTransport.newTrustedTransport(),
-                    JacksonFactory.getDefaultInstance(),
-                    credential)
-                    .build();
-        } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Can not be to connect to 'Google sheet service'.");
+        if (sheetsService == null) {
+            Credential credential = GoogleAuthorizeUtil.authorize();
+            try {
+                sheetsService = new Sheets.Builder(
+                        GoogleNetHttpTransport.newTrustedTransport(),
+                        JacksonFactory.getDefaultInstance(),
+                        credential)
+                        .build();
+
+            } catch (GeneralSecurityException | IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Can not be to connect to 'Google sheet service'.");
+            }
         }
+        return sheetsService;
     }
 
     public static UpdateValuesResponse writeToSheet(List<String[]> data, String googleSheetId) {

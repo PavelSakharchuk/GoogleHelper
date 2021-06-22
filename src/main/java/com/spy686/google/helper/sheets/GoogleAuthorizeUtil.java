@@ -36,11 +36,11 @@ public class GoogleAuthorizeUtil {
             .getString(PropertiesValue.GOOGLE_HELPER_AUTH_CLIENT_ID);
     private static final String GOOGLE_SHEETS_SERVICE_CLIENT_SECRET = applicationConfigBundle
             .getString(PropertiesValue.GOOGLE_HELPER_AUTH_CLIENT_SECRET);
-    private static final String GOOGLE_SHEETS_SERVICE_CLIENT_REFRESH_TOKEN = applicationConfigBundle
+    private static String googleSheetsServiceClientRefreshToken = applicationConfigBundle
             .getString(PropertiesValue.GOOGLE_HELPER_AUTH_CLIENT_REFRESH_TOKEN);
 
     public static Credential authorize() {
-        if (null == GOOGLE_SHEETS_SERVICE_CLIENT_REFRESH_TOKEN) {
+        if (null == googleSheetsServiceClientRefreshToken || googleSheetsServiceClientRefreshToken.isEmpty()) {
             // Need for manual getting refreshToken
             return login();
         } else {
@@ -65,12 +65,13 @@ public class GoogleAuthorizeUtil {
                     scopes)
                     .setDataStoreFactory(new MemoryDataStoreFactory())
                     .setAccessType("offline")
-//                    .setApprovalPrompt("auto")
-                    // https://stackoverflow.com/questions/8942340/get-refresh-token-google-api
-                    .setApprovalPrompt("consent")
+                    .setApprovalPrompt("auto")
                     .build();
 
-            return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+            Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+            System.out.println("refreshToken: " + credential.getRefreshToken());
+            googleSheetsServiceClientRefreshToken = credential.getRefreshToken();
+            return credential;
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(
@@ -92,7 +93,7 @@ public class GoogleAuthorizeUtil {
                     .setJsonFactory(JacksonFactory.getDefaultInstance())
                     .setTransport(GoogleNetHttpTransport.newTrustedTransport())
                     .build()
-                    .setRefreshToken(GOOGLE_SHEETS_SERVICE_CLIENT_REFRESH_TOKEN);
+                    .setRefreshToken(googleSheetsServiceClientRefreshToken);
             credential.refreshToken();
             return credential;
         } catch (IOException e) {
