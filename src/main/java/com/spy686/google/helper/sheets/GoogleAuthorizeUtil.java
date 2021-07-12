@@ -30,14 +30,17 @@ public class GoogleAuthorizeUtil {
     private static final ResourceBundle applicationConfigBundle = ResourceBundle
             .getBundle(PropertiesName.APPLICATION_CONFIG);
 
-    private static final String GOOGLE_SHEETS_CLIENT_SECRET_TEMPLATE_JSON_FILE_PATH = applicationConfigBundle
+    private static final String googleSheetsClientSecretTemplateJsonFilePath = applicationConfigBundle
             .getString(PropertiesValue.GOOGLE_HELPER_TEMPLATE_JSON);
-    private static final String GOOGLE_SHEETS_SERVICE_CLIENT_ID = applicationConfigBundle
-            .getString(PropertiesValue.GOOGLE_HELPER_AUTH_CLIENT_ID);
-    private static final String GOOGLE_SHEETS_SERVICE_CLIENT_SECRET = applicationConfigBundle
-            .getString(PropertiesValue.GOOGLE_HELPER_AUTH_CLIENT_SECRET);
-    private static String googleSheetsServiceClientRefreshToken = applicationConfigBundle
-            .getString(PropertiesValue.GOOGLE_HELPER_AUTH_CLIENT_REFRESH_TOKEN);
+    private static final String googleSheetsServiceClientIdFromSystem = System.getenv(PropertiesValue.GOOGLE_HELPER_AUTH_CLIENT_ID);
+    private static final String googleSheetsServiceClientId = googleSheetsServiceClientIdFromSystem != null ? googleSheetsServiceClientIdFromSystem :
+            applicationConfigBundle.getString(PropertiesValue.GOOGLE_HELPER_AUTH_CLIENT_ID);
+    private static final String googleSheetsServiceClientFromSystem = System.getenv(PropertiesValue.GOOGLE_HELPER_AUTH_CLIENT_SECRET);
+    private static final String googleSheetsServiceClientSecret = googleSheetsServiceClientFromSystem != null ? googleSheetsServiceClientFromSystem :
+            applicationConfigBundle.getString(PropertiesValue.GOOGLE_HELPER_AUTH_CLIENT_SECRET);
+    private static final String googleSheetsServiceClientRefreshTokenFromSystem = System.getenv(PropertiesValue.GOOGLE_HELPER_AUTH_CLIENT_REFRESH_TOKEN);
+    private static String googleSheetsServiceClientRefreshToken = googleSheetsServiceClientRefreshTokenFromSystem != null ? googleSheetsServiceClientRefreshTokenFromSystem :
+            applicationConfigBundle.getString(PropertiesValue.GOOGLE_HELPER_AUTH_CLIENT_REFRESH_TOKEN);
 
     public static Credential authorize() {
         if (null == googleSheetsServiceClientRefreshToken || googleSheetsServiceClientRefreshToken.isEmpty()) {
@@ -52,11 +55,11 @@ public class GoogleAuthorizeUtil {
         List<String> scopes = Arrays.asList(SheetsScopes.SPREADSHEETS);
         try {
             InputStream googleSheetsClientSecretTemplateJson = GoogleAuthorizeUtil.class
-                    .getResourceAsStream(GOOGLE_SHEETS_CLIENT_SECRET_TEMPLATE_JSON_FILE_PATH);
+                    .getResourceAsStream(googleSheetsClientSecretTemplateJsonFilePath);
             GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
                     JacksonFactory.getDefaultInstance(), new InputStreamReader(googleSheetsClientSecretTemplateJson));
-            clientSecrets.getInstalled().setClientId(GOOGLE_SHEETS_SERVICE_CLIENT_ID);
-            clientSecrets.getInstalled().setClientSecret(GOOGLE_SHEETS_SERVICE_CLIENT_SECRET);
+            clientSecrets.getInstalled().setClientId(googleSheetsServiceClientId);
+            clientSecrets.getInstalled().setClientSecret(googleSheetsServiceClientSecret);
 
             GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                     GoogleNetHttpTransport.newTrustedTransport(),
@@ -75,7 +78,7 @@ public class GoogleAuthorizeUtil {
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(
-                    String.format("'%s' file can not be read.", GOOGLE_SHEETS_CLIENT_SECRET_TEMPLATE_JSON_FILE_PATH));
+                    String.format("'%s' file can not be read.", googleSheetsClientSecretTemplateJsonFilePath));
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
             throw new RuntimeException(
@@ -89,7 +92,7 @@ public class GoogleAuthorizeUtil {
     public static Credential getCredential() {
         try {
             Credential credential = new GoogleCredential.Builder()
-                    .setClientSecrets(GOOGLE_SHEETS_SERVICE_CLIENT_ID, GOOGLE_SHEETS_SERVICE_CLIENT_SECRET)
+                    .setClientSecrets(googleSheetsServiceClientId, googleSheetsServiceClientSecret)
                     .setJsonFactory(JacksonFactory.getDefaultInstance())
                     .setTransport(GoogleNetHttpTransport.newTrustedTransport())
                     .build()
